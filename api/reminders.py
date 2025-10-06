@@ -8,7 +8,7 @@ import sys
 # Add project directory to path for imports when running as script
 sys.path.insert(0, 'py-project')
 
-from api.csv_handler import add_reminder, get_reminders_by_user_id, get_reminder_by_id, update_reminder
+from api.db_handler import add_reminder, get_reminders_by_user_id, get_reminder_by_id, update_reminder
 
 reminders_bp = Blueprint('reminders', __name__)
 
@@ -40,8 +40,8 @@ def create_reminder():
             return redirect(url_for('reminders.create_reminder'))
         
         try:
-            # Create new reminder using CSV
-            add_reminder(str(current_user.id), title, description, reminder_time, recipient_email)
+            # Create new reminder using DB
+            add_reminder(str(current_user.id), title, description, reminder_time.strftime('%Y-%m-%d %H:%M:%S'), recipient_email)
             flash('Reminder created successfully!')
         except Exception as e:
             print(f"Error creating reminder for user {current_user.id}: {e}")
@@ -74,8 +74,8 @@ def edit_reminder(reminder_id):
             flash('Invalid date/time format')
             return redirect(url_for('reminders.edit_reminder', reminder_id=reminder_id))
         
-        # Update reminder using CSV
-        update_reminder(reminder_id, title, description, reminder_time, recipient_email, attachment)
+        # Update reminder using DB
+        update_reminder(reminder_id, title, description, reminder_time.strftime('%Y-%m-%d %H:%M:%S'), recipient_email)
         flash('Reminder updated successfully!')
         return redirect(url_for('reminders.dashboard'))
     

@@ -10,7 +10,8 @@ from apscheduler.executors.asyncio import AsyncIOExecutor
 from flask import Flask, jsonify
 
 from api.auth import User, mail
-from api.csv_handler import get_user_by_id
+from api.models import db
+from api.db_handler import get_user_by_id
 from api.email_service import check_and_send_reminders
 
 # Initialize extensions
@@ -18,6 +19,11 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '..', 'templates'))
+
+    # Database configuration
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
 
     # Validate required environment variables
     required_env_vars = ['SECRET_KEY', 'MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_DEFAULT_SENDER', 'SYSTEM_SENDER_EMAIL', 'SYSTEM_APP_PASSWORD']
@@ -114,6 +120,10 @@ def create_app():
             import traceback
             print("❌ Failed to start background scheduler:", e)
             traceback.print_exc()
+
+    # Create database tables
+    with app.app_context():
+        db.create_all()
 
     return app
 

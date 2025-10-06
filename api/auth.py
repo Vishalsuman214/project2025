@@ -11,7 +11,7 @@ import sys
 # Add project directory to path for imports when running as script
 sys.path.insert(0, 'py-project')
 
-from api.csv_handler import add_user, get_user_by_email, get_user_by_id, verify_password, generate_verification_token, set_verification_token, verify_email, generate_reset_token, set_reset_token, reset_password, update_user_email_credentials
+from api.db_handler import add_user, get_user_by_email, get_user_by_id, verify_password, generate_verification_token, set_verification_token, verify_email, generate_reset_token, set_reset_token, reset_password, update_user_email_credentials
 
 # System email credentials (loaded inside functions for dynamic updates)
 
@@ -172,9 +172,9 @@ def forgot_password():
             token = generate_reset_token(email)
             from datetime import datetime, timedelta
             expiry = datetime.now() + timedelta(hours=1)
-            set_reset_token(user_data['id'], token, expiry)
+            set_reset_token(user_data.id, token, expiry)
             try:
-                send_reset_email(email, token, user_data.get('name', 'User'))
+                send_reset_email(email, token, user_data.email.split('@')[0])  # Use part of email as name
                 flash('If the email exists, a reset link has been sent.', 'info')
             except Exception as e:
                 flash('Password reset unsuccessful - email not sent.', 'error')
@@ -192,11 +192,11 @@ def login():
 
         user_data = get_user_by_email(email)
 
-        if user_data and verify_password(password, user_data['password_hash']):
+        if user_data and verify_password(password, user_data.password_hash):
             user = User(
-                id=user_data['id'],
-                email=user_data['email'],
-                password_hash=user_data['password_hash']
+                id=user_data.id,
+                email=user_data.email,
+                password_hash=user_data.password_hash
             )
 
             login_user(user)
