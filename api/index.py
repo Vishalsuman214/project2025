@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, send_from_directory
 from flask_login import LoginManager
 from flask_mail import Mail
 import os
@@ -62,6 +62,11 @@ def create_app():
     @app.route('/')
     def home():
         return redirect(url_for('auth.login'))
+
+    @app.route('/favicon.ico')
+    def favicon():
+        return send_from_directory(os.path.join(app.root_path, 'static'),
+                                   'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
     @app.route('/cron/reminders')
     def cron_reminders():
