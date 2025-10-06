@@ -17,6 +17,7 @@ def read_users():
     return users
 
 def write_users(users):
+    os.makedirs(os.path.dirname(USERS_CSV), exist_ok=True)
     with open(USERS_CSV, mode='w', newline='', encoding='utf-8') as file:
         fieldnames = ['id', 'email', 'password_hash', 'is_email_confirmed', 'verification_token', 'reset_token', 'reset_token_expiry', 'profile_picture', 'bio', 'email_credentials', 'app_password']
         writer = csv.DictWriter(file, fieldnames=fieldnames)
@@ -203,6 +204,7 @@ def mark_reminder_completed(reminder_id):
             break
 
     if updated:
+        os.makedirs(os.path.dirname(REMINDERS_CSV), exist_ok=True)
         with open(REMINDERS_CSV, 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=['id', 'user_id', 'title', 'description', 'reminder_time', 'recipient_email', 'is_completed'])
             writer.writeheader()
@@ -228,6 +230,7 @@ def add_reminder(user_id, title, description, reminder_time, recipient_email):
             reader = csv.DictReader(f)
             reminders = list(reader)
     reminders.append(new_reminder)
+    os.makedirs(os.path.dirname(REMINDERS_CSV), exist_ok=True)
     with open(REMINDERS_CSV, 'w', newline='', encoding='utf-8') as f:
         fieldnames = ['id', 'user_id', 'title', 'description', 'reminder_time', 'recipient_email', 'is_completed']
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -280,6 +283,7 @@ def update_reminder(reminder_id, title=None, description=None, reminder_time=Non
             break
 
     if updated:
+        os.makedirs(os.path.dirname(REMINDERS_CSV), exist_ok=True)
         with open(REMINDERS_CSV, 'w', newline='', encoding='utf-8') as f:
             fieldnames = ['id', 'user_id', 'title', 'description', 'reminder_time', 'recipient_email', 'is_completed']
             writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -301,6 +305,7 @@ def delete_reminder(reminder_id):
     reminders = [reminder for reminder in reminders if reminder['id'] != reminder_id]
 
     if len(reminders) < original_length:
+        os.makedirs(os.path.dirname(REMINDERS_CSV), exist_ok=True)
         with open(REMINDERS_CSV, 'w', newline='', encoding='utf-8') as f:
             fieldnames = ['id', 'user_id', 'title', 'description', 'reminder_time', 'recipient_email', 'is_completed']
             writer = csv.DictWriter(f, fieldnames=fieldnames)
